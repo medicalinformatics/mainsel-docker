@@ -1,0 +1,55 @@
+version: "3"
+services:
+  postgres:
+    container_name: srl-postgres-1
+    image: postgres:9.5-alpine
+    volumes:
+      - ./config/db/scripts:/docker-entrypoint-initdb.d/
+      - ./logs/tuda-postgres:/var/log/postgresql
+    # Enable the following on Linux hosts to enable persistency
+    # (won't work on Windows due to upstream bug, see https://github.com/docker/for-win/issues/445
+      - ./data/tuda-postgres:/var/lib/postgresql/data
+    depends_on:
+      - secureepilinker
+    networks:
+      - selml
+  mainzelliste:
+    image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
+    container_name: srl-mainzelliste-1
+    environment:
+      - LOCAL_ID=dkfz
+      - LOCAL_SEL_URL=http://srl-sel-1:8161
+      - LOCAL_CALLBACK_LINK_URL=http://srl-mainzelliste-1:8080/Communicator/linkCallback
+      - LOCAL_CALLBACK_MATCH_URL=http://srl-mainzelliste-1:8080/Communicator/matchCallback/tuda
+      - LOCAL_DATA_SERVICE_URL=http://srl-mainzelliste-1:8080/Communicator/getAllRecords
+      - SERVER_0_REMOTEID=tuda
+      - SERVER_0_IDTYPE=link-dkfz-tuda
+      - SERVER_0_REMOTE_SEL_URL=http://172.17.0.1:8162
+      - SERVER_0_LINKAGE_SERVICE_BASE_URL=http://192.168.2.120:5000
+      - SERVER_0_LINKAGE_SERVICE_AUTH_TYPE=apiKey
+      - SERVER_0_LINKAGE_SERVICE_SHARED_KEY=bcd234
+      - LOCAL_API_KEY=123qwerty
+      - SERVER_0_APIKEY=123qwerty
+      - LOCAL_AUTHENTICATION_TYPE=apiKey
+      - LOG_MODE=stdout #stdout=stdout everything else =logging in mainzelliste.log
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./config/tuda-mainzelliste:/etc/mainzelliste/
+      - ./logs/tuda-mainzelliste:/usr/local/tomcat/logs/
+    links:
+      - postgres:db
+    depends_on:
+      - postgres
+      - secureepilinker
+    networks:
+      - selml
+  secureepilinker:
+    image: docker.verbis.dkfz.de/cord/sel:ubuntu
+    container_name: srl-sel-1
+    command: '-vvv'
+    networks:
+      - selml
+
+#TODO: One Network for ml and sel and one network for postgres and ml would make sense
+networks:
+  selml:

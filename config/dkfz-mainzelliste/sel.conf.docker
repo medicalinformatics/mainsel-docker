@@ -1,0 +1,41 @@
+# Template properties for initializer
+#
+# Lokale Mainzelliste
+#
+# Local ID of this mainzelliste distribution instance.
+localID = LOCAL_ID
+localSELUrl = LOCAL_SEL_URL
+localApiKey = LOCAL_API_KEY
+localAuthenticationType = LOCAL_AUTHENTICATION_TYPE
+
+
+localCallbackLinkUrl = LOCAL_CALLBACK_LINK_URL
+#TODO Everything after matchCallback should be set per remote not add once
+localCallbackMatchUrl = LOCAL_CALLBACK_MATCH_URL
+
+
+localDataServiceUrl = LOCAL_DATA_SERVICE_URL
+
+
+# field bitlength
+field.vorname.bitlength = 500
+field.nachname.bitlength = 500
+field.geburtsname.bitlength = 500
+field.geburtstag.bitlength = 5
+field.geburtsmonat.bitlength = 4
+field.geburtsjahr.bitlength = 12
+field.plz.bitlength = 80
+field.ort.bitlength = 500
+
+#
+# xDAT servers
+#
+
+# A passphrase used for authentication
+servers.0.apiKey = SERVER_0_APIKEY
+servers.0.remoteId = SERVER_0_REMOTEID
+servers.0.idType = SERVER_0_IDTYPE
+servers.0.remoteSELUrl = SERVER_0_REMOTE_SEL_URL
+servers.0.linkageServiceBaseURL = SERVER_0_LINKAGE_SERVICE_BASE_URL
+servers.0.linkageServiceAuthType = SERVER_0_LINKAGE_SERVICE_AUTH_TYPE
+servers.0.linkageServiceSharedKey = SERVER_0_LINKAGE_SERVICE_SHARED_KEY
