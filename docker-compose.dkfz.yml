@@ -1,7 +1,6 @@
 version: "3"
 services:
   postgres:
-    container_name: srl-postgres-1
     image: postgres:9.5-alpine
     volumes:
       - ./config/db/scripts:/docker-entrypoint-initdb.d/
@@ -15,13 +14,12 @@ services:
       - selml
   mainzelliste:
     image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
-    container_name: srl-mainzelliste-1
     environment:
       - LOCAL_ID=dkfz
-      - LOCAL_SEL_URL=http://srl-sel-1:8161
-      - LOCAL_CALLBACK_LINK_URL=http://srl-mainzelliste-1:8080/Communicator/linkCallback
-      - LOCAL_CALLBACK_MATCH_URL=http://srl-mainzelliste-1:8080/Communicator/matchCallback/tuda
-      - LOCAL_DATA_SERVICE_URL=http://srl-mainzelliste-1:8080/Communicator/getAllRecords
+      - LOCAL_SEL_URL=http://secureepilinker:8161
+      - LOCAL_CALLBACK_LINK_URL=http://mainzelliste:8080/Communicator/linkCallback
+      - LOCAL_CALLBACK_MATCH_URL=http://mainzelliste:8080/Communicator/matchCallback/tuda
+      - LOCAL_DATA_SERVICE_URL=http://mainzelliste:8080/Communicator/getAllRecords
       - SERVER_0_REMOTEID=tuda
       - SERVER_0_IDTYPE=link-dkfz-tuda
       - SERVER_0_REMOTE_SEL_URL=http://172.17.0.1:8162
@@ -45,7 +43,6 @@ services:
       - selml
   secureepilinker:
     image: docker.verbis.dkfz.de/cord/sel:ubuntu
-    container_name: srl-sel-1
     command: '-vvv'
     networks:
       - selml
