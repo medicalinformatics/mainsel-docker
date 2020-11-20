@@ -1,6 +1,6 @@
 version: "3"
 services:
-  postgres:
+  postgres_dkfz:
     image: postgres:9.5-alpine
     volumes:
       - ./config/db/scripts:/docker-entrypoint-initdb.d/
@@ -11,8 +11,9 @@ services:
     depends_on:
       - secureepilinker
     networks:
-      - selml
-  mainzelliste:
+      - default
+      - smpc-network
+  mainzelliste_dkfz:
     image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
     environment:
       - LOCAL_ID=dkfz
@@ -34,19 +35,20 @@ services:
     volumes:
       - ./config/dkfz-mainzelliste:/etc/mainzelliste/
       - ./logs/dkfz-mainzelliste:/usr/local/tomcat/logs/
-    links:
-      - postgres:db
     depends_on:
       - postgres
       - secureepilinker
     networks:
-      - selml
-  secureepilinker:
+      - default
+      - smpc-network
+  secureepilinker_dkfz:
     image: docker.verbis.dkfz.de/cord/sel:ubuntu
     command: '-vvv'
     networks:
-      - selml
+      - default
+      - smpc-network
 
-#TODO: One Network for ml and sel and one network for postgres and ml would make sense
 networks:
-  selml:
+  ## create this network with command: docker network create -d bridge smpc-network --scope swarm
+  smpc-network:
+    external: true
