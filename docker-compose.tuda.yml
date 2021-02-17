@@ -3,13 +3,13 @@ services:
   postgres_tuda:
     image: postgres:9.5-alpine
     volumes:
-      - ./config/db/scripts:/docker-entrypoint-initdb.d/
-      - ./logs/tuda-postgres:/var/log/postgresql
+      # - ./config/db/scripts:/docker-entrypoint-initdb.d/
+      - postgresLogs:/var/log/postgresql
     # Enable the following on Linux hosts to enable persistency
     # (won't work on Windows due to upstream bug, see https://github.com/docker/for-win/issues/445
-      - ./data/tuda-postgres:/var/lib/postgresql/data
+      - postgresData:/var/lib/postgresql/data
     depends_on:
-      - secureepilinker
+      - secureepilinker_tuda
     networks:
       - default
       - smpc-network
@@ -17,10 +17,10 @@ services:
     image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
     environment:
       - LOCAL_ID=dkfz
-      - LOCAL_SEL_URL=http://secureepilinker:8161
-      - LOCAL_CALLBACK_LINK_URL=http://mainzelliste:8080/Communicator/linkCallback
-      - LOCAL_CALLBACK_MATCH_URL=http://mainzelliste:8080/Communicator/matchCallback/tuda
-      - LOCAL_DATA_SERVICE_URL=http://mainzelliste:8080/Communicator/getAllRecords
+      - LOCAL_SEL_URL=http://secureepilinker_tuda:8161
+      - LOCAL_CALLBACK_LINK_URL=http://mainzelliste_tuda:8080/Communicator/linkCallback
+      - LOCAL_CALLBACK_MATCH_URL=http://mainzelliste_tuda:8080/Communicator/matchCallback/tuda
+      - LOCAL_DATA_SERVICE_URL=http://mainzelliste_tuda:8080/Communicator/getAllRecords
       - SERVER_0_REMOTEID=tuda
       - SERVER_0_IDTYPE=link-dkfz-tuda
       - SERVER_0_REMOTE_SEL_URL=http://172.17.0.1:8162
@@ -34,10 +34,10 @@ services:
       - LOG_LEVEL=DEBUG
     volumes:
       - ./config/tuda-mainzelliste:/etc/mainzelliste/
-      - ./logs/tuda-mainzelliste:/usr/local/tomcat/logs/
+      - mainzellisteLogs:/usr/local/tomcat/logs/
     depends_on:
-      - postgres
-      - secureepilinker
+      - postgres_tuda
+      - secureepilinker_tuda
     networks:
       - default
       - smpc-network
@@ -51,3 +51,7 @@ networks:
   ## create this network with command: docker network create -d bridge smpc-network --scope swarm
   smpc-network:
     external: true
+volumes:
+  mainzellisteLogs:
+  postgresData:
+  postgresLogs:
