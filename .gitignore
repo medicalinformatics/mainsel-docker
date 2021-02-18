@@ -1,2 +1,6 @@
+### ignore site specific configuration
+.env
+docker-compose.override.yml
+### ignore data locally created
 logs
 data
