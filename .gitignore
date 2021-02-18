@@ -4,3 +4,4 @@ docker-compose.override.yml
 ### ignore data locally created
 logs
 data
+test-data/transformed.csv

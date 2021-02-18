@@ -39,3 +39,15 @@ You will need to repeat this command for all parties joining the computation.
 docker exec anjou_mainzelliste_1 wget http://localhost:8080/Communicator/triggerMatch/bapu
 ```
 
+## Adding Testdata to one mainzelliste
+
+Transforming data into expected format
+
+``` sh
+./scripts/transformCsv.sh ./test-data/A1_Person.csv > test-data/transformed.csv
+```
+
+``` sh
+docker run --network anjou_intranet --network-alias mainzelliste-benchmark -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/transformed.csv" -t "CSV" -k "testApi" -u "http://mainzelliste:8080"
+```
+> Note: currently we have an issue with mainzelliste denying requests by benchmark tool, will be fixed in next commits
