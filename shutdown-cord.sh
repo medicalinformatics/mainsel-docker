@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-SITE=${SITE:-teststandort}
-docker-compose -f docker-compose.${SITE}.yml -f docker-compose.${SITE}.override.yml -p ${SITE} down
+echo "Info: Sourcing trying to source .env file";
+source ./.env;
+echo "Info: Shutting down party ${SITE}";
+docker-compose -p ${SITE} down;
