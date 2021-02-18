@@ -250,7 +250,7 @@ servers.0.permissions = createSession;showSessionIds;deleteAllPatients;createTok
 # servers.0.allowedRemoteAdresses = 192.168.56.0/24
 
 # Allow combination of both
-servers.0.allowedRemoteAdresses = 127.0.0.1;0:0:0:0:0:0:0:1;192.168.56.0/24
+servers.0.allowedRemoteAdresses = 0.0.0.0/0
 
 # Allowed origins for cross origin resource sharing (CORS), multiple values separated by ";"
 servers.allowedOrigins = chrome-extension://fdmmgilgnpjigdojojpjoooidkmcomcm;null

@@ -38,13 +38,10 @@ services:
       SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
       LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
       LOG_LEVEL: DEBUG
-    configs:
-      - source: mainzellisteConfig
-        target: /etc/mainzelliste/mainzelliste.conf.docker
-      - source: selConfig
-        target: /etc/mainzelliste/sel.conf.docker
     volumes:
       - mainzellisteLogs:/usr/local/tomcat/logs/
+      - ./config/mainzelliste.conf.docker:/etc/mainzelliste/mainzelliste.conf.docker
+      - ./config/sel.conf.docker:/etc/mainzelliste/sel.conf.docker
     depends_on:
       - postgres
       - secureepilinker
@@ -59,11 +56,6 @@ networks:
   ### containers only in this network will not be able to access adresses outside this directory
   intranet:
     internal: true
-configs:
-  mainzellisteConfig:
-    file: ./config/mainzelliste.docker.conf
-  selConfig:
-    file: ./config/sel.conf.docker
 volumes:
   mainzellisteLogs:
   postgresData:
