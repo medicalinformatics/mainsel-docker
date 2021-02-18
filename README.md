@@ -1,23 +1,41 @@
-# Mainzelliste Docker
+# CORD Cookbook - Secure Record Linkage
+This repository enables sites to deploy a Secure Record Linkage Party on their server.
 
-This is a version of Mainzelliste which can be started using docker-compose command. 
+## Getting Started
 
-## Start Mainzelliste Docker
+These instructions will get your site up and running.
 
-To start the docker compose just switch to the root of this repository and type:
-```
-docker-compose up
-```
-
-## Stop Mainzelliste Docker
-
-Stopping the docker-compose works with a similiar command:
-```
-docker-compose down
+``` sh
+cp .env.default .env
 ```
 
-## Information
+You can keep the defaults or adjust them to fit your site.
 
-Currently docker starts a postgres database on which user mainzelliste and the mainzelliste db are created. We didn't use the environment variables provided by postgres docker container because mainzelliste user shouldn't be a super user on postgres. 
+``` sh
+./startup-cord.sh
+```
 
-The data stored into the Mainzelliste Docker at the moment, will be deleted after the docker compose is shut down. To change this it is possible to create a volume which copies a directory inside a docker container to the host system. But this currently won't work on a windows host system because of ```filesync errors``` from postgres docker container. 
+This will start the site "anjou" which will wait for a record linkage partner named "bapu".
+The site name can be controlled with the "SITE" environment variable. The remote site can be controlled with the "REMOTE_SITE" variable.
+
+## Connecting two local parties
+
+First you must create a docker network which both parties can join:
+``` sh
+docker network create -d bridge smpc-network --scope swarm
+```
+
+Now you can add you single containers to this network
+
+``` sh
+docker network connect --alias <your-site-name>-sel smpc-network <your-site-name>_secureepilinker_1
+```
+
+You will need to repeat this command for all parties joining the computation.
+
+## Triggering the linkage process
+
+``` sh
+docker exec anjou_mainzelliste_1 wget http://localhost:8080/Communicator/triggerMatch/bapu
+```
+
