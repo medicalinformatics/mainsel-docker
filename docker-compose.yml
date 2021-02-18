@@ -1,0 +1,70 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres:9.5-alpine
+    environment:
+      POSTGRES_DB: mainzelliste-sel
+      POSTGRES_USER: mainzelliste-sel
+      POSTGRES_PASSWORD: ${MAINZELLISTE_DB_PASSWORD:?You need to set the MAINZELLISTE_DB_PASSWORD Variable}
+    volumes:
+      - postgresLogs:/var/log/postgresql
+      - postgresData:/var/lib/postgresql/data
+    depends_on:
+      - secureepilinker
+    networks:
+      - intranet
+  mainzelliste:
+    image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
+    environment:
+      ML_DB_HOST: postgres
+      ML_DB_PORT: 5432
+      ML_DB_USER: mainzelliste-sel
+      ML_DB_NAME: mainzelliste-sel
+      ML_DB_PASS: ${MAINZELLISTE_DB_PASSWORD:?You need to set the MAINZELLISTE_DB_PASSWORD Variable}
+      LOCAL_ID: ${SITE:-anjou}
+      LOCAL_SEL_URL: http://secureepilinker:8161
+      LOCAL_CALLBACK_LINK_URL: http://mainzelliste:8080/Communicator/linkCallback
+      LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${SITE:-anjou}
+      LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
+      LOCAL_AUTHENTICATION_TYPE: apiKey
+      LOCAL_API_KEY: ${LOCAL_API_KEY:?You need to set LOCAL_API_KEY environment variable}
+      SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
+      SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
+      SERVER_0_REMOTE_SEL_URL: http://${REMOTE_SITE:-bapu}-sel:8162
+      SERVER_0_APIKEY: ${REMOTE_API_KEY:?You need to set the REMOTE_API_KEY environment variable}
+      ### TODO: What is the LINKAGE_SERVICE?
+      SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
+      SERVER_0_LINKAGE_SERVICE_AUTH_TYPE: apiKey
+      SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
+      LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
+      LOG_LEVEL: DEBUG
+    configs:
+      - source: mainzellisteConfig
+        target: /etc/mainzelliste/mainzelliste.conf.docker
+      - source: selConfig
+        target: /etc/mainzelliste/sel.conf.docker
+    volumes:
+      - mainzellisteLogs:/usr/local/tomcat/logs/
+    depends_on:
+      - postgres
+      - secureepilinker
+    networks:
+      - intranet
+  secureepilinker:
+    image: docker.verbis.dkfz.de/cord/sel:ubuntu
+    command: '-vvv'
+    networks:
+      - intranet
+networks:
+  ### containers only in this network will not be able to access adresses outside this directory
+  intranet:
+    internal: true
+configs:
+  mainzellisteConfig:
+    file: ./config/mainzelliste.docker.conf
+  selConfig:
+    file: ./config/sel.conf.docker
+volumes:
+  mainzellisteLogs:
+  postgresData:
+  postgresLogs:
