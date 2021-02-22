@@ -1,0 +1,44 @@
+[
+  {
+    "inputColumn": "Vorname",
+    "outputColumn": "vorname"
+  },
+  {
+    "inputColumn": "Nachname",
+    "outputColumn": "nachname"
+  },
+  {
+    "inputColumn": "Geburtsname",
+    "outputColumn": "geburtsname"
+  },
+  {
+    "inputColumn": "Geschlecht"
+  },
+  {
+    "inputColumn": "PLZ",
+    "outputColumn": "plz"
+  },
+  {
+    "inputColumn": "Wohnort",
+    "outputColumn": "ort"
+  },
+  {
+    "inputColumn": "Geburtsdatum",
+    "outputColumn": "geburtstag",
+    "regex": "-(\\d+)"
+  },
+  {
+    "inputColumn": "Geburtsdatum",
+    "outputColumn": "geburtsmonat",
+    "regex": "-(\\d+)-"
+  },
+  {
+    "inputColumn": "Geburtsdatum",
+    "outputColumn": "geburtsjahr",
+    "regex": "(\\d+)-"
+  },
+  {
+    "inputColumn": "Versichertennummer",
+    "outputColumn": "versichertennummer"
+  }
+]
