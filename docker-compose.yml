@@ -16,6 +16,7 @@ services:
   mainzelliste:
     image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
     environment:
+      JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket, address=1043, server=y, suspend=y"
       ML_DB_HOST: postgres
       ML_DB_PORT: 5432
       ML_DB_USER: mainzelliste-sel
@@ -30,7 +31,7 @@ services:
       LOCAL_API_KEY: ${LOCAL_API_KEY:?You need to set LOCAL_API_KEY environment variable}
       SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
       SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
-      SERVER_0_REMOTE_SEL_URL: http://${REMOTE_SITE:-bapu}-sel:8162
+      SERVER_0_REMOTE_SEL_URL: http://${REMOTE_SITE:-bapu}-sel:8161
       SERVER_0_APIKEY: ${REMOTE_API_KEY:?You need to set the REMOTE_API_KEY environment variable}
       ### TODO: What is the LINKAGE_SERVICE?
       SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
@@ -42,6 +43,7 @@ services:
       - mainzellisteLogs:/usr/local/tomcat/logs/
       - ./config/mainzelliste.conf.docker:/etc/mainzelliste/mainzelliste.conf.docker
       - ./config/sel.conf.docker:/etc/mainzelliste/sel.conf.docker
+      - ./config/initializer.config.xml:/etc/mainzelliste/initializer.config.xml
     depends_on:
       - postgres
       - secureepilinker
@@ -49,6 +51,15 @@ services:
       - intranet
   secureepilinker:
     image: docker.verbis.dkfz.de/cord/sel:ubuntu
+    # environment:
+      # LOCALSCHEMA:
+      # REMOTESCHEMA:
+      # LINKSCHEMA:
+      # SELKEY:
+      # SELDHPARAM:
+      # SELCERT:
+      # SELPORT:
+      # SELLOGFILE: "./sel.log"
     command: '-vvv'
     networks:
       - intranet

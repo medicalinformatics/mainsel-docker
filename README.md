@@ -22,7 +22,7 @@ The site name can be controlled with the "SITE" environment variable. The remote
 
 First you must create a docker network which both parties can join:
 ``` sh
-docker network create -d bridge smpc-network --scope swarm
+docker network create -d bridge smpc-network
 ```
 
 Now you can add you single containers to this network
@@ -36,7 +36,11 @@ You will need to repeat this command for all parties joining the computation.
 ## Triggering the linkage process
 
 ``` sh
-docker exec anjou_mainzelliste_1 wget http://localhost:8080/Communicator/triggerMatch/bapu
+docker exec anjou_mainzelliste_1 curl -v -k "http://secureepilinker:8161/test/bapu"
+```
+
+``` sh
+docker exec anjou_mainzelliste_1 wget http://localhost:8080/Communicator/triggerMNMatch/bapu
 ```
 
 ## Adding Testdata to one mainzelliste
@@ -48,6 +52,6 @@ Transforming data into expected format
 ```
 
 ``` sh
-docker run --network anjou_intranet --network-alias mainzelliste-benchmark -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/transformed.csv" -t "CSV" -k "testApi" -u "http://mainzelliste:8080"
+docker run --network anjou_intranet -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/A1_Person.csv" -t "CSV" -k "testApi" -u "http://mainzelliste:8080" -l 100
 ```
 > Note: currently we have an issue with mainzelliste denying requests by benchmark tool, will be fixed in next commits

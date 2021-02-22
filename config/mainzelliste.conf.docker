@@ -56,6 +56,7 @@ field.geburtsmonat.type = IntegerField
 field.geburtsjahr.type = IntegerField
 field.plz.type = PlainTextField
 field.ort.type = PlainTextField
+# field.versichertennummer.type = PlainTextField
 
 
 # Server-side validation
@@ -70,9 +71,9 @@ validator.field.geburtsjahr.required = true
 # validator.field.{fieldname}.format: Regular expresssion which a field must adhere to.
 
 # Default: letters, dots, underscores, apostrophes, spaces; at least one letter.
-validator.field.vorname.format = [A-Za-zäÄöÖüÜß\\.\\-' ]*[A-Za-zäÄöÖüÜß]+[A-Za-zäÄöÖüÜß\\.\\-' ]*
-validator.field.nachname.format = [A-Za-zäÄöÖüÜß\\.\\-' ]*[A-Za-zäÄöÖüÜß]+[A-Za-zäÄöÖüÜß\\.\\-' ]*
-validator.field.geburtsname.format = [A-Za-zäÄöÖüÜß\\.\\-' ]*[A-Za-zäÄöÖüÜß]+[A-Za-zäÄöÖüÜß\\.\\-' ]*
+validator.field.vorname.format = [0-9A-Za-zäÄöÖüÜß\\.\\-\\_' ]*[0-9A-Za-zäÄöÖüÜß]+[0-9A-Za-zäÄöÖüÜß\\.\\-\\_' ]*
+validator.field.nachname.format = [0-9A-Za-zäÄöÖüÜß\\.\\-\\_' ]*[0-9A-Za-zäÄöÖüÜß]+[0-9A-Za-zäÄöÖüÜß\\.\\-\\_' ]*
+validator.field.geburtsname.format = [0-9A-Za-zäÄöÖüÜß\\.\\-\\_' ]*[0-9A-Za-zäÄöÖüÜß]+[0-9A-Za-zäÄöÖüÜß\\.\\-\\_' ]*
 
 # Date validation:
 # validator.date.{i}.fields defines a list of fields, separated by commas.
@@ -184,8 +185,7 @@ matcher.epilink.ort.errorRate = 0.04
 # Record pairs with a weight w with threshold_non_match <= w < threshold_match are
 # considered possible matches and lead to a tentative PID.
 matcher.epilink.threshold_match = 0.95
-matcher.epilink.threshold_non_match = 0.6
-
+matcher.epilink.threshold_non_match = 0.8
 
 # ID-Generators
 #
@@ -196,7 +196,7 @@ matcher.epilink.threshold_non_match = 0.6
 # additional parameters depend on the ID generator used.
 #
 # Additional params for PIDGenerator (k1, k2, k3, rndwidth) are defined here.
-idgenerators = pid, intid, extid, link-dkfz-tuda
+idgenerators = pid, intid, extid
 idgenerator.pid = PIDGenerator
 idgenerator.pid.k1 = 1
 idgenerator.pid.k2 = 2
@@ -208,7 +208,7 @@ idgenerator.intid = SimpleIDGenerator
 
 idgenerator.extid = ExternalIDGenerator
 
-idgenerator.link-dkfz-tuda = SrlIDGenerator
+# idgenerator.link-dkfz-tuda = SrlIDGenerator
 
 # Output of result
 
@@ -239,7 +239,7 @@ result.printIdat = true
 
 # A passphrase used for authentication
 servers.0.apiKey = testApi
-servers.0.permissions = createSession;showSessionIds;deleteAllPatients;createToken;tt_addPatient;tt_readPatients;tt_editPatient
+servers.0.permissions = createSession;showSessionIds;deleteAllPatients;createToken;tt_addPatient;tt_readPatients;tt_editPatient;readConfiguration
 
 # Accepted origin addresses (IPv4 and/or IPv6) or address ranges in CIDR notation (IPv4 only)
 
