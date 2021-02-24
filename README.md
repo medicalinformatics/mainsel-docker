@@ -45,13 +45,8 @@ docker exec anjou_mainzelliste_1 wget http://localhost:8080/Communicator/trigger
 
 ## Adding Testdata to one mainzelliste
 
-Transforming data into expected format
+Importing the first 100 records into the Meinzelliste database. Omit ```-l 100``` parameter to import every record.
 
 ``` sh
-./scripts/transformCsv.sh ./test-data/A1_Person.csv > test-data/transformed.csv
+docker run --network anjou_intranet -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/A1_Person.csv" -c "/data/A1_Person.csv.rules" -t "CSV" -k "testApi" -u "http://mainzelliste:8080" -l 100
 ```
-
-``` sh
-docker run --network anjou_intranet -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/A1_Person.csv" -t "CSV" -k "testApi" -u "http://mainzelliste:8080" -l 100
-```
-> Note: currently we have an issue with mainzelliste denying requests by benchmark tool, will be fixed in next commits
