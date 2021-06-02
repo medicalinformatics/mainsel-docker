@@ -14,7 +14,8 @@ services:
     networks:
       - intranet
   mainzelliste:
-    image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL09
+          # image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL10
+    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL11
     environment:
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket, address=1043, server=y, suspend=y"
       ML_DB_HOST: postgres
@@ -22,16 +23,16 @@ services:
       ML_DB_USER: mainzelliste-sel
       ML_DB_NAME: mainzelliste-sel
       ML_DB_PASS: ${MAINZELLISTE_DB_PASSWORD:?You need to set the MAINZELLISTE_DB_PASSWORD Variable}
-      LOCAL_ID: ${SITE:-anjou}
+      LOCAL_ID: anjou
       LOCAL_SEL_URL: http://secureepilinker:8161
       LOCAL_CALLBACK_LINK_URL: http://mainzelliste:8080/Communicator/linkCallback
       LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${SITE:-anjou}
       LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
       LOCAL_AUTHENTICATION_TYPE: apiKey
       LOCAL_API_KEY: ${LOCAL_API_KEY:?You need to set LOCAL_API_KEY environment variable}
-      SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
+      SERVER_0_REMOTEID: bapu
       SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
-      SERVER_0_REMOTE_SEL_URL: http://${REMOTE_SITE:-bapu}-sel:8161
+      SERVER_0_REMOTE_SEL_URL: http://stunnel_client:8161
       SERVER_0_APIKEY: ${REMOTE_API_KEY:?You need to set the REMOTE_API_KEY environment variable}
       ### TODO: What is the LINKAGE_SERVICE?
       SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
@@ -50,7 +51,7 @@ services:
     networks:
       - intranet
   secureepilinker:
-    image: docker.verbis.dkfz.de/cord/sel:ubuntu
+    image: sel:ubuntu-dev
     # environment:
       # LOCALSCHEMA:
       # REMOTESCHEMA:
@@ -63,10 +64,50 @@ services:
     command: '-vvv'
     networks:
       - intranet
+  stunnel_client:
+    image: stunnel:dweomer
+    environment:
+      - STUNNEL_CLIENT=yes
+      - STUNNEL_SERVICE=sel
+      - STUNNEL_PSK=/data/psk.txt
+      - STUNNEL_CONNECT_1=192.168.178.64:29170
+      - STUNNEL_CONNECT_2=192.168.178.64:29171
+      - STUNNEL_CONNECT_3=192.168.178.64:29172
+      - STUNNEL_ACCEPT_1=:::8161
+      - STUNNEL_ACCEPT_2=:::1337
+      - STUNNEL_ACCEPT_3=:::1338
+    ports:
+      - "29170-29172:29170-29172"
+    networks:
+      - intranet
+      - frontend
+    volumes:
+      - ./config/stunnel_clt_psk.txt:/data/psk.txt
+  stunnel_srv:
+    image: stunnel:dweomer
+    environment:
+      - STUNNEL_CLIENT=no
+      - STUNNEL_SERVICE=sel
+      - STUNNEL_PSK=/data/psk.txt
+      - STUNNEL_ACCEPT_1=:::29173
+      - STUNNEL_ACCEPT_2=:::29174
+      - STUNNEL_ACCEPT_3=:::29175
+      - STUNNEL_CONNECT_1=secureepilinker:8161
+      - STUNNEL_CONNECT_2=secureepilinker:1337
+      - STUNNEL_CONNECT_3=secureepilinker:1338
+    ports:
+      - "29173-29175:29173-29175"
+    networks:
+      - intranet
+      - frontend
+    volumes:
+      - ./config/stunnel_clt_psk.txt:/data/psk.txt
 networks:
   ### containers only in this network will not be able to access adresses outside this directory
   intranet:
     internal: true
+  frontend:
+    driver: bridge
 volumes:
   mainzellisteLogs:
   postgresData:
