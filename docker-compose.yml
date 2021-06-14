@@ -30,11 +30,11 @@ services:
       LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
       LOCAL_AUTHENTICATION_TYPE: apiKey
       LOCAL_API_KEY: ${LOCAL_API_KEY:?You need to set LOCAL_API_KEY environment variable}
-      SERVER_0_REMOTEID: bapu
+      SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
       SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
       SERVER_0_REMOTE_SEL_URL: http://stunnel_client:8161
       SERVER_0_APIKEY: ${REMOTE_API_KEY:?You need to set the REMOTE_API_KEY environment variable}
-      ### TODO: What is the LINKAGE_SERVICE?
+      ### Linkage Service not used for matching
       SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
       SERVER_0_LINKAGE_SERVICE_AUTH_TYPE: apiKey
       SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
@@ -51,7 +51,13 @@ services:
     networks:
       - intranet
   secureepilinker:
-    image: sel:ubuntu-dev
+    image: sel:debug
+    cap_add:
+            - SYS_PTRACE
+            - net_admin
+    links:
+            - vpn:stunnel_client
+            - vpn:stunnel_srv
     # environment:
       # LOCALSCHEMA:
       # REMOTESCHEMA:
@@ -70,44 +76,69 @@ services:
       - STUNNEL_CLIENT=yes
       - STUNNEL_SERVICE=sel
       - STUNNEL_PSK=/data/psk.txt
-      - STUNNEL_CONNECT_1=192.168.178.64:29170
-      - STUNNEL_CONNECT_2=192.168.178.64:29171
-      - STUNNEL_CONNECT_3=192.168.178.64:29172
-      - STUNNEL_ACCEPT_1=:::8161
-      - STUNNEL_ACCEPT_2=:::1337
-      - STUNNEL_ACCEPT_3=:::1338
-    ports:
-      - "29170-29172:29170-29172"
-    networks:
-      - intranet
-      - frontend
+      - STUNNEL_CONNECT_1=${REMOTE_TUNNEL:-192.168.255.3}:29170
+      - STUNNEL_CONNECT_2=${REMOTE_TUNNEL:-192.168.255.3}:29171
+      - STUNNEL_CONNECT_3=${REMOTE_TUNNEL:-192.168.255.3}:29172
+      - STUNNEL_ACCEPT_1=192.168.240.2:8161
+      - STUNNEL_ACCEPT_2=192.168.240.2:1337
+      - STUNNEL_ACCEPT_3=192.168.240.2:1338
+    network_mode: "service:vpn"
     volumes:
       - ./config/stunnel_clt_psk.txt:/data/psk.txt
+    depends_on:
+      - vpn
   stunnel_srv:
     image: stunnel:dweomer
     environment:
       - STUNNEL_CLIENT=no
       - STUNNEL_SERVICE=sel
       - STUNNEL_PSK=/data/psk.txt
-      - STUNNEL_ACCEPT_1=:::29173
-      - STUNNEL_ACCEPT_2=:::29174
-      - STUNNEL_ACCEPT_3=:::29175
+      - STUNNEL_ACCEPT_1=${LOCAL_TUNNEL:-192.168.255.2}:29173
+      - STUNNEL_ACCEPT_2=${LOCAL_TUNNEL:-192.168.255.2}:29174
+      - STUNNEL_ACCEPT_3=${LOCAL_TUNNEL:-192.168.255.2}:29175
       - STUNNEL_CONNECT_1=secureepilinker:8161
       - STUNNEL_CONNECT_2=secureepilinker:1337
       - STUNNEL_CONNECT_3=secureepilinker:1338
-    ports:
-      - "29173-29175:29173-29175"
-    networks:
-      - intranet
-      - frontend
+    network_mode: "service:vpn"
+    depends_on:
+      - vpn
     volumes:
-      - ./config/stunnel_clt_psk.txt:/data/psk.txt
+            - ./config/stunnel_clt_psk.txt:/data/psk.txt
+  vpn:
+    image: dperson/openvpn-client
+    cap_add:
+            - net_admin
+    networks:
+            frontend: {}
+            intranet:
+                    ipv4_address: 192.168.240.2
+    environment: 
+            ROUTE: "192.168.240.0/24"
+    read_only: true
+    ports:
+      - "29170-29175:29170-29175"
+    tmpfs:
+            - /run
+            - /tmp
+              #restart: unless-stopped
+    security_opt:
+            - label:disable
+    volumes:
+            - /dev/net:/dev/net:z
+            - ./config/vpn:/vpn
+
 networks:
   ### containers only in this network will not be able to access adresses outside this directory
   intranet:
     internal: true
+    ipam:
+            config:
+                    - subnet: 192.168.240.0/24
   frontend:
     driver: bridge
+    ipam:
+            config:
+                    - subnet: 192.168.245.0/24
 volumes:
   mainzellisteLogs:
   postgresData:
