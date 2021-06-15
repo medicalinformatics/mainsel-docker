@@ -1,26 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+: ${ANJOU_VPN_IP=192.168.255.2};
+: ${BAPU_VPN_IP=192.168.255.3};
+: ${CYNTHIA_VPN_IP=192.168.255.4};
+
 echo "Info: Sourcing trying to source .env file";
+export SITE=${1:-anjou}
+export REMOTE_SITE=${2:-bapu}
 source ./.env;
-SITE=${1:-anjou}
-REMOTE_SITE=${2:-bapu}
 if [ $SITE = anjou ]; then
-	LOCAL_TUNNEL=$ANJOU_VPN_IP
+	export LOCAL_TUNNEL=$ANJOU_VPN_IP
 fi
 if [ $SITE = bapu ]; then
-	LOCAL_TUNNEL=$BAPU_VPN_IP
+	export LOCAL_TUNNEL=$BAPU_VPN_IP
 fi
 if [ $SITE = cynthia ]; then
-	LOCAL_TUNNEL=$CYNTHIA_VPN_IP
+	export LOCAL_TUNNEL=$CYNTHIA_VPN_IP
 fi
 if [ $REMOTE_SITE = anjou ]; then
-	REMOTE_TUNNEL=$ANJOU_VPN_IP
+	export REMOTE_TUNNEL=$ANJOU_VPN_IP
 fi
 if [ $REMOTE_SITE = bapu ]; then
-	REMOTE_TUNNEL=$BAPU_VPN_IP
+	export REMOTE_TUNNEL=$BAPU_VPN_IP
 fi
 if [ $REMOTE_SITE = cynthia ]; then
-	REMOTE_TUNNEL=$CYNTHIA_VPN_IP
+	export REMOTE_TUNNEL=$CYNTHIA_VPN_IP
 fi
 echo "Info: Shutting down party ${SITE}";
 docker-compose -f docker-compose.yml -p ${SITE} down;

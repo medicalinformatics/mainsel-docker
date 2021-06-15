@@ -14,8 +14,7 @@ services:
     networks:
       - intranet
   mainzelliste:
-          # image: docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL10
-    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL11
+    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL12
     environment:
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket, address=1043, server=y, suspend=y"
       ML_DB_HOST: postgres
@@ -51,10 +50,7 @@ services:
     networks:
       - intranet
   secureepilinker:
-    image: sel:debug
-    cap_add:
-            - SYS_PTRACE
-            - net_admin
+    image: docker.verbis.dkfz.de/cord/sel:debug
     links:
             - vpn:stunnel_client
             - vpn:stunnel_srv
@@ -71,31 +67,32 @@ services:
     networks:
       - intranet
   stunnel_client:
-    image: stunnel:dweomer
+    image: docker.verbis.dkfz.de/cord/stunnel:develop
     environment:
       - STUNNEL_CLIENT=yes
       - STUNNEL_SERVICE=sel
       - STUNNEL_PSK=/data/psk.txt
-      - STUNNEL_CONNECT_1=${REMOTE_TUNNEL:-192.168.255.3}:29170
-      - STUNNEL_CONNECT_2=${REMOTE_TUNNEL:-192.168.255.3}:29171
-      - STUNNEL_CONNECT_3=${REMOTE_TUNNEL:-192.168.255.3}:29172
-      - STUNNEL_ACCEPT_1=192.168.240.2:8161
-      - STUNNEL_ACCEPT_2=192.168.240.2:1337
-      - STUNNEL_ACCEPT_3=192.168.240.2:1338
+      - STUNNEL_CONNECT_1=${REMOTE_TUNNEL}:29170
+      - STUNNEL_CONNECT_2=${REMOTE_TUNNEL}:29171
+      - STUNNEL_CONNECT_3=${REMOTE_TUNNEL}:29172
+      - STUNNEL_ACCEPT_1=:::8161
+      - STUNNEL_ACCEPT_2=:::1337
+      - STUNNEL_ACCEPT_3=:::1338
     network_mode: "service:vpn"
     volumes:
       - ./config/stunnel_clt_psk.txt:/data/psk.txt
     depends_on:
       - vpn
   stunnel_srv:
-    image: stunnel:dweomer
+    image: docker.verbis.dkfz.de/cord/stunnel:develop
+    restart: always
     environment:
       - STUNNEL_CLIENT=no
       - STUNNEL_SERVICE=sel
       - STUNNEL_PSK=/data/psk.txt
-      - STUNNEL_ACCEPT_1=${LOCAL_TUNNEL:-192.168.255.2}:29173
-      - STUNNEL_ACCEPT_2=${LOCAL_TUNNEL:-192.168.255.2}:29174
-      - STUNNEL_ACCEPT_3=${LOCAL_TUNNEL:-192.168.255.2}:29175
+      - STUNNEL_ACCEPT_1=${LOCAL_TUNNEL}:29170
+      - STUNNEL_ACCEPT_2=${LOCAL_TUNNEL}:29171
+      - STUNNEL_ACCEPT_3=${LOCAL_TUNNEL}:29172
       - STUNNEL_CONNECT_1=secureepilinker:8161
       - STUNNEL_CONNECT_2=secureepilinker:1337
       - STUNNEL_CONNECT_3=secureepilinker:1338
@@ -111,12 +108,7 @@ services:
     networks:
             frontend: {}
             intranet:
-                    ipv4_address: 192.168.240.2
-    environment: 
-            ROUTE: "192.168.240.0/24"
     read_only: true
-    ports:
-      - "29170-29175:29170-29175"
     tmpfs:
             - /run
             - /tmp
@@ -125,20 +117,14 @@ services:
             - label:disable
     volumes:
             - /dev/net:/dev/net:z
-            - ./config/vpn:/vpn
+            - ./config/${SITE}-vpn:/vpn
 
 networks:
-  ### containers only in this network will not be able to access adresses outside this directory
+  ### containers only in this network will not be able to access addresses outside this directory
   intranet:
     internal: true
-    ipam:
-            config:
-                    - subnet: 192.168.240.0/24
   frontend:
     driver: bridge
-    ipam:
-            config:
-                    - subnet: 192.168.245.0/24
 volumes:
   mainzellisteLogs:
   postgresData:
