@@ -33,4 +33,3 @@ echo "Info: Now starting party ${SITE} ready for connection with site ${REMOTE_S
 docker-compose -f docker-compose.yml -p ${SITE} up -d;
 
 docker exec "$SITE"_vpn_1 iptables -A INPUT -s 192.168.255.0/24 -i tun+ -j ACCEPT;
-docker exec "$REMOTE_SITE"_vpn_1 iptables -A INPUT -s 192.168.255.0/24 -i tun+ -j ACCEPT;
