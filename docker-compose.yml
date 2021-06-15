@@ -14,7 +14,7 @@ services:
     networks:
       - intranet
   mainzelliste:
-    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL12
+    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL14
     environment:
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket, address=1043, server=y, suspend=y"
       ML_DB_HOST: postgres
@@ -25,7 +25,7 @@ services:
       LOCAL_ID: anjou
       LOCAL_SEL_URL: http://secureepilinker:8161
       LOCAL_CALLBACK_LINK_URL: http://mainzelliste:8080/Communicator/linkCallback
-      LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${SITE:-anjou}
+      LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${REMOTE_SITE:-bapu}
       LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
       LOCAL_AUTHENTICATION_TYPE: apiKey
       LOCAL_API_KEY: ${LOCAL_API_KEY:?You need to set LOCAL_API_KEY environment variable}
@@ -52,8 +52,8 @@ services:
   secureepilinker:
     image: docker.verbis.dkfz.de/cord/sel:debug
     links:
-            - vpn:stunnel_client
-            - vpn:stunnel_srv
+      - vpn:stunnel_client
+      - vpn:stunnel_srv
     # environment:
       # LOCALSCHEMA:
       # REMOTESCHEMA:
@@ -100,24 +100,24 @@ services:
     depends_on:
       - vpn
     volumes:
-            - ./config/stunnel_clt_psk.txt:/data/psk.txt
+      - ./config/stunnel_clt_psk.txt:/data/psk.txt
   vpn:
     image: dperson/openvpn-client
     cap_add:
-            - net_admin
+      - net_admin
     networks:
-            frontend: {}
-            intranet:
+      frontend: {}
+      intranet:
     read_only: true
     tmpfs:
-            - /run
-            - /tmp
-              #restart: unless-stopped
+      - /run
+      - /tmp
+      #restart: unless-stopped
     security_opt:
-            - label:disable
+      - label:disable
     volumes:
-            - /dev/net:/dev/net:z
-            - ./config/${SITE}-vpn:/vpn
+      - /dev/net:/dev/net:z
+      - ./config/${SITE}-vpn:/vpn
 
 networks:
   ### containers only in this network will not be able to access addresses outside this directory
