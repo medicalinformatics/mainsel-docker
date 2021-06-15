@@ -54,6 +54,8 @@ services:
     links:
       - vpn:stunnel_client
       - vpn:stunnel_srv
+    volumes:
+      - "./config/epilinker.serverconf.json:/data/serverconf.json"
     # environment:
       # LOCALSCHEMA:
       # REMOTESCHEMA:
