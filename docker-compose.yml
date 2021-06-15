@@ -38,7 +38,7 @@ services:
       SERVER_0_LINKAGE_SERVICE_AUTH_TYPE: apiKey
       SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
       LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
-      LOG_LEVEL: DEBUG
+      LOG_LEVEL: INFO
     volumes:
       - mainzellisteLogs:/usr/local/tomcat/logs/
       - ./config/mainzelliste.conf.docker:/etc/mainzelliste/mainzelliste.conf.docker
