@@ -14,7 +14,7 @@ services:
     networks:
       - intranet
   mainzelliste:
-    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL14
+    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL15
     environment:
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket, address=1043, server=y, suspend=y"
       ML_DB_HOST: postgres
