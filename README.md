@@ -50,3 +50,17 @@ Importing the first 100 records into the Meinzelliste database. Omit ```-l 100``
 ``` sh
 docker run --network anjou_intranet -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/A1_Person.csv" -c "/data/A1_Person.csv.rules" -t "CSV" -k "testApi" -u "http://mainzelliste:8080" -l 100
 ```
+
+
+## Info then using proxy
+Then running behind the proxy, it is necessary to tell the vpn client to use the proxy. This must be configured in your sites vpn client configuration, [ e.g. anjou](./config/anjou-vpn/anjou.opvn).
+
+The configuration should look like this:
+
+```
+### Above something like "remote-tls-server"
+proto tcp
+http-proxy <your-proxy-host-here>  <your-proxy-port-here>
+### Below something like "remote XXX port tcp"
+```
+
