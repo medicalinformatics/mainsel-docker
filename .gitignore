@@ -3,4 +3,3 @@
 docker-compose.override.yml
 ### ignore data locally created
 test-data/
-config/vpn
