@@ -50,7 +50,7 @@ services:
     networks:
       - intranet
   secureepilinker:
-    image: docker.verbis.dkfz.de/cord/sel:debug
+    image: docker.verbis.dkfz.de/cord/sel:v1.0.1-ubuntu
     links:
       - vpn:stunnel_client
       - vpn:stunnel_srv
