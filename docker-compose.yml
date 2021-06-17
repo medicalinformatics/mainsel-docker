@@ -16,7 +16,6 @@ services:
   mainzelliste:
     image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL15
     environment:
-      JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket, address=1043, server=y, suspend=y"
       ML_DB_HOST: postgres
       ML_DB_PORT: 5432
       ML_DB_USER: mainzelliste-sel
@@ -43,7 +42,6 @@ services:
       - mainzellisteLogs:/usr/local/tomcat/logs/
       - ./config/mainzelliste.conf.docker:/etc/mainzelliste/mainzelliste.conf.docker
       - ./config/sel.conf.docker:/etc/mainzelliste/sel.conf.docker
-      - ./config/initializer.config.xml:/etc/mainzelliste/initializer.config.xml
     depends_on:
       - postgres
       - secureepilinker
@@ -56,16 +54,7 @@ services:
       - vpn:stunnel_srv
     volumes:
       - "./config/epilinker.serverconf.json:/data/serverconf.json"
-    # environment:
-      # LOCALSCHEMA:
-      # REMOTESCHEMA:
-      # LINKSCHEMA:
-      # SELKEY:
-      # SELDHPARAM:
-      # SELCERT:
-      # SELPORT:
-      # SELLOGFILE: "./sel.log"
-    command: '-vvv'
+    command: '-vv'
     networks:
       - intranet
   stunnel_client:
