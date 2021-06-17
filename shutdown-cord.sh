@@ -5,10 +5,14 @@ set -euo pipefail
 : ${BAPU_VPN_IP=192.168.255.3};
 : ${CYNTHIA_VPN_IP=192.168.255.4};
 
-echo "Info: Sourcing trying to source .env file";
 export SITE=${1:-anjou}
 export REMOTE_SITE=${2:-bapu}
-source ./.env;
+
+if [ -f "./.env" ]; then
+    echo "Info: Sourcing trying to source .env file";
+    source ./.env;
+fi
+
 if [ $SITE = anjou ]; then
 	export LOCAL_TUNNEL=$ANJOU_VPN_IP
 fi
