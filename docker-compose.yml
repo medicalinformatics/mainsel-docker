@@ -120,7 +120,7 @@ services:
       - label:disable
     volumes:
       - /dev/net:/dev/net:z
-      - ./config/${SITE}-vpn:/vpn
+      - ./config/vpn:/vpn
 
 networks:
   ### containers only in this network will not be able to access addresses outside this directory
