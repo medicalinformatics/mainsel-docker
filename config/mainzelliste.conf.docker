@@ -137,8 +137,8 @@ blockingFields.0 geburtsmonat, geburtsjahr
 # Property matcher defines the class name of the matcher to use, which must be a subclass
 # of Matcher. Currently only EpilinkMatcher and NullMatcher are supported.
 # Null matcher is used to skip the step of record linkage
-matcher = EpilinkMatcher
-# matcher = NullMatcher
+# matcher = EpilinkMatcher
+matcher = NullMatcher
 
 # Config for Epilink Matcher
 #
