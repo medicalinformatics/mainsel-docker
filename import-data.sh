@@ -5,4 +5,4 @@ if [ $# -eq 2 ]; then
 else
 	NUMBER=""
 fi
-docker run --network ${SITE}_intranet -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/gotthard_${SITE}.csv" -c "/data/transformation.csv.rules" -t "CSV" -k "testApi" -u "http://mainzelliste:8080" ${NUMBER}
+MSYS_NO_PATHCONV=1 docker run --network ${SITE}_intranet -v "$(pwd)/test-data/":/data docker.verbis.dkfz.de/cord/mainzelliste-benchmark ADD_PATIENT -i "/data/gotthard_${SITE}.csv" -c "/data/transformation.csv.rules" -t "CSV" -k "testApi" -u "http://mainzelliste:8080" ${NUMBER}
