@@ -3,18 +3,18 @@
 # Lokale Mainzelliste
 #
 # Local ID of this mainzelliste distribution instance.
-localID = LOCAL_ID
-localSELUrl = LOCAL_SEL_URL
-localApiKey = LOCAL_API_KEY
-localAuthenticationType = LOCAL_AUTHENTICATION_TYPE
+localID = ML_LOCAL_ID
+localSELUrl = ML_LOCAL_SEL_URL
+localApiKey = ML_LOCAL_API_KEY
+localAuthenticationType = ML_LOCAL_AUTHENTICATION_TYPE
 
 
-localCallbackLinkUrl = LOCAL_CALLBACK_LINK_URL
+localCallbackLinkUrl = ML_LOCAL_CALLBACK_LINK_URL
 #TODO Everything after matchCallback should be set per remote not add once
-localCallbackMatchUrl = LOCAL_CALLBACK_MATCH_URL
+localCallbackMatchUrl = ML_LOCAL_CALLBACK_MATCH_URL
 
 
-localDataServiceUrl = LOCAL_DATA_SERVICE_URL
+localDataServiceUrl = ML_LOCAL_DATA_SERVICE_URL
 
 
 # field bitlength
@@ -32,10 +32,10 @@ field.ort.bitlength = 500
 #
 
 # A passphrase used for authentication
-servers.0.apiKey = SERVER_0_APIKEY
-servers.0.remoteId = SERVER_0_REMOTEID
-servers.0.idType = SERVER_0_IDTYPE
-servers.0.remoteSELUrl = SERVER_0_REMOTE_SEL_URL
-servers.0.linkageServiceBaseURL = SERVER_0_LINKAGE_SERVICE_BASE_URL
-servers.0.linkageServiceAuthType = SERVER_0_LINKAGE_SERVICE_AUTH_TYPE
-servers.0.linkageServiceSharedKey = SERVER_0_LINKAGE_SERVICE_SHARED_KEY
+servers.0.apiKey = ML_SERVER_0_APIKEY
+servers.0.remoteId = ML_SERVER_0_REMOTEID
+servers.0.idType = ML_SERVER_0_IDTYPE
+servers.0.remoteSELUrl = ML_SERVER_0_REMOTE_SEL_URL
+servers.0.linkageServiceBaseURL = ML_SERVER_0_LINKAGE_SERVICE_BASE_URL
+servers.0.linkageServiceAuthType = ML_SERVER_0_LINKAGE_SERVICE_AUTH_TYPE
+servers.0.linkageServiceSharedKey = ML_SERVER_0_LINKAGE_SERVICE_SHARED_KEY
