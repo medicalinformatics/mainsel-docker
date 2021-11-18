@@ -48,7 +48,7 @@ services:
     networks:
       - intranet
   secureepilinker:
-    image: docker.verbis.dkfz.de/cord/sel:v1.0.1-ubuntu
+    image: ghcr.io/medicalinformatics/secureepilinker:ubuntu-feature-automaticDockerBuild 
     links:
       - vpn:stunnel_client
       - vpn:stunnel_srv
