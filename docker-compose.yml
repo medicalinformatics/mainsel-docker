@@ -14,34 +14,36 @@ services:
     networks:
       - intranet
   mainzelliste:
-    image:  docker.verbis.dkfz.de/cord/mainzelliste:1.7.0-RC1-SEL15
+    image:  medicalinformatics/mainzelliste:secureepilinker-alpha
     environment:
+      ML_API_KEY: apiKey
       ML_DB_HOST: postgres
       ML_DB_PORT: 5432
       ML_DB_USER: mainzelliste-sel
       ML_DB_NAME: mainzelliste-sel
       ML_DB_PASS: ${MAINZELLISTE_DB_PASSWORD:-pleaseChangeMe}
-      LOCAL_ID: ${SITE:-anjou}
-      LOCAL_SEL_URL: http://secureepilinker:8161
-      LOCAL_CALLBACK_LINK_URL: http://mainzelliste:8080/Communicator/linkCallback
-      LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${REMOTE_SITE:-bapu}
-      LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
-      LOCAL_AUTHENTICATION_TYPE: apiKey
-      LOCAL_API_KEY: ${LOCAL_API_KEY:-thisApikeyIsNotSecure}
-      SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
-      SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
-      SERVER_0_REMOTE_SEL_URL: http://stunnel_client:8161
-      SERVER_0_APIKEY: ${REMOTE_API_KEY:-thisApikeyIsNotSecure}
+      ML_LOCAL_ID: ${SITE:-anjou}
+      ML_LOCAL_SEL_URL: http://secureepilinker:8161
+      ML_LOCAL_CALLBACK_LINK_URL: http://mainzelliste:8080/Communicator/linkCallback
+      ML_LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${REMOTE_SITE:-bapu}
+      ML_LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
+      ML_LOCAL_AUTHENTICATION_TYPE: apiKey
+      ML_LOCAL_API_KEY: ${LOCAL_API_KEY:-thisApikeyIsNotSecure}
+      ML_SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
+      ML_SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
+      ML_SERVER_0_REMOTE_SEL_URL: http://stunnel_client:8161
+      ML_SERVER_0_APIKEY: ${REMOTE_API_KEY:-thisApikeyIsNotSecure}
       ### Linkage Service not used for matching
-      SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
-      SERVER_0_LINKAGE_SERVICE_AUTH_TYPE: apiKey
-      SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
-      LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
-      LOG_LEVEL: INFO
+      ML_SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
+      ML_SERVER_0_LINKAGE_SERVICE_AUTH_TYPE: apiKey
+      ML_SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
+      ML_LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
+      ML_LOG_LEVEL: INFO
+      no_proxy: "localhost,secureepilinker"
     volumes:
       - mainzellisteLogs:/usr/local/tomcat/logs/
-      - ./config/mainzelliste.conf.docker:/etc/mainzelliste/mainzelliste.conf.docker
-      - ./config/sel.conf.docker:/etc/mainzelliste/sel.conf.docker
+      - ./config/mainzelliste.conf.docker:/run/secrets/mainzelliste.docker.conf
+      - ./config/sel.conf.docker:/run/secrets/sel.docker.conf
     depends_on:
       - postgres
       - secureepilinker
@@ -52,9 +54,11 @@ services:
     links:
       - vpn:stunnel_client
       - vpn:stunnel_srv
+    environment:
+      no_proxy: "mainzelliste,stunnel_client"
     volumes:
       - "./config/epilinker.serverconf.json:/data/serverconf.json"
-    command: '-vv'
+    command: '-vvvv'
     networks:
       - intranet
   stunnel_client:

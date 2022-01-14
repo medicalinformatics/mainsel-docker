@@ -34,6 +34,6 @@ fi
 echo "Debug: $SITE has LOCAL_TUNNEL=$LOCAL_TUNNEL"
 echo "Debug: $REMOTE_SITE has REMOTE_TUNNEL=$REMOTE_TUNNEL"
 echo "Info: Now starting party ${SITE} ready for connection with site ${REMOTE_SITE}";
-docker-compose -f docker-compose.yml -p ${SITE} up -d;
+docker-compose -p ${SITE} up -d;
 
 docker-compose -p ${SITE} exec vpn iptables -A INPUT -s 192.168.255.0/24 -i tun+ -j ACCEPT;
