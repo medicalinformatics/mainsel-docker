@@ -14,7 +14,7 @@ services:
     networks:
       - intranet
   mainzelliste:
-    image:  medicalinformatics/mainzelliste:secureepilinker-alpha
+    image:  mainzelliste:develop
     environment:
       ML_API_KEY: apiKey
       ML_DB_HOST: postgres
@@ -29,6 +29,7 @@ services:
       ML_LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
       ML_LOCAL_AUTHENTICATION_TYPE: apiKey
       ML_LOCAL_API_KEY: ${LOCAL_API_KEY:-thisApikeyIsNotSecure}
+
       ML_SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
       ML_SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
       ML_SERVER_0_REMOTE_SEL_URL: http://stunnel_client:8161
@@ -37,6 +38,16 @@ services:
       ML_SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
       ML_SERVER_0_LINKAGE_SERVICE_AUTH_TYPE: apiKey
       ML_SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
+
+      ML_SERVER_1_REMOTEID: ${REMOTE_SITE_2:-cynthia}
+      ML_SERVER_1_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE_2:-cynthia}
+      ML_SERVER_1_REMOTE_SEL_URL: http://stunnel_client:8161
+      ML_SERVER_1_APIKEY: ${REMOTE_API_KEY:-thisApikeyIsNotSecure}
+      ### Linkage Service not used for matching
+      ML_SERVER_1_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
+      ML_SERVER_1_LINKAGE_SERVICE_AUTH_TYPE: apiKey
+      ML_SERVER_1_LINKAGE_SERVICE_SHARED_KEY: bcd234
+
       ML_LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
       ML_LOG_LEVEL: INFO
       no_proxy: "localhost,secureepilinker"

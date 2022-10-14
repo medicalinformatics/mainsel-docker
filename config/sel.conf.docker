@@ -1,21 +1,13 @@
-# Template properties for initializer
-#
-# Lokale Mainzelliste
-#
-# Local ID of this mainzelliste distribution instance.
+# Local configuration for MainSEL
 localID = ML_LOCAL_ID
 localSELUrl = ML_LOCAL_SEL_URL
 localApiKey = ML_LOCAL_API_KEY
 localAuthenticationType = ML_LOCAL_AUTHENTICATION_TYPE
 
-
 localCallbackLinkUrl = ML_LOCAL_CALLBACK_LINK_URL
 #TODO Everything after matchCallback should be set per remote not add once
 localCallbackMatchUrl = ML_LOCAL_CALLBACK_MATCH_URL
-
-
 localDataServiceUrl = ML_LOCAL_DATA_SERVICE_URL
-
 
 # field bitlength
 field.vorname.bitlength = 500
@@ -27,11 +19,7 @@ field.geburtsjahr.bitlength = 12
 field.plz.bitlength = 80
 field.ort.bitlength = 500
 
-#
-# xDAT servers
-#
-
-# A passphrase used for authentication
+# First Remote Server
 servers.0.apiKey = ML_SERVER_0_APIKEY
 servers.0.remoteId = ML_SERVER_0_REMOTEID
 servers.0.idType = ML_SERVER_0_IDTYPE
@@ -39,3 +27,12 @@ servers.0.remoteSELUrl = ML_SERVER_0_REMOTE_SEL_URL
 servers.0.linkageServiceBaseURL = ML_SERVER_0_LINKAGE_SERVICE_BASE_URL
 servers.0.linkageServiceAuthType = ML_SERVER_0_LINKAGE_SERVICE_AUTH_TYPE
 servers.0.linkageServiceSharedKey = ML_SERVER_0_LINKAGE_SERVICE_SHARED_KEY
+
+# Second Remote Server
+servers.1.apiKey = ML_SERVER_1_APIKEY
+servers.1.remoteId = ML_SERVER_1_REMOTEID
+servers.1.idType = ML_SERVER_1_IDTYPE
+servers.1.remoteSELUrl = ML_SERVER_1_REMOTE_SEL_URL
+servers.1.linkageServiceBaseURL = ML_SERVER_1_LINKAGE_SERVICE_BASE_URL
+servers.1.linkageServiceAuthType = ML_SERVER_1_LINKAGE_SERVICE_AUTH_TYPE
+servers.1.linkageServiceSharedKey = ML_SERVER_1_LINKAGE_SERVICE_SHARED_KEY
