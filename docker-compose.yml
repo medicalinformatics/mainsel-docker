@@ -7,31 +7,31 @@ services:
       POSTGRES_USER: mainzelliste-sel
       POSTGRES_PASSWORD: ${MAINZELLISTE_DB_PASSWORD:-pleaseChangeMe}
     volumes:
-      - postgresLogs:/var/log/postgresql
-      - postgresData:/var/lib/postgresql/data
+      - ./postgres-logs:/var/log/postgresql
+      - ./pg-data:/var/lib/postgresql/data
     depends_on:
-      - secureepilinker
+      - sel
     networks:
       - intranet
   mainzelliste:
     image:  medicalinformatics/mainzelliste:secureepilinker-alpha
     environment:
-      ML_API_KEY: apiKey
+      ML_API_KEY: ${LOCAL_API_KEY:-thisApikeyIsNotSecure}
       ML_DB_HOST: postgres
       ML_DB_PORT: 5432
       ML_DB_USER: mainzelliste-sel
       ML_DB_NAME: mainzelliste-sel
       ML_DB_PASS: ${MAINZELLISTE_DB_PASSWORD:-pleaseChangeMe}
-      ML_LOCAL_ID: ${SITE:-anjou}
-      ML_LOCAL_SEL_URL: http://secureepilinker:8161
+      ML_LOCAL_ID: ${SITE:-proxy1}
+      ML_LOCAL_SEL_URL: http://sel:8161
       ML_LOCAL_CALLBACK_LINK_URL: http://mainzelliste:8080/Communicator/linkCallback
       ML_LOCAL_CALLBACK_MATCH_URL: http://mainzelliste:8080/Communicator/matchCallback/${REMOTE_SITE:-bapu}
       ML_LOCAL_DATA_SERVICE_URL: http://mainzelliste:8080/Communicator/getAllRecords
       ML_LOCAL_AUTHENTICATION_TYPE: apiKey
       ML_LOCAL_API_KEY: ${LOCAL_API_KEY:-thisApikeyIsNotSecure}
-      ML_SERVER_0_REMOTEID: ${REMOTE_SITE:-bapu}
-      ML_SERVER_0_IDTYPE: link-${SITE:-anjou}-${REMOTE_SITE:-bapu}
-      ML_SERVER_0_REMOTE_SEL_URL: http://stunnel_client:8161
+      ML_SERVER_0_REMOTEID: ${REMOTE_SITE:-proxy2}
+      ML_SERVER_0_IDTYPE: link-${SITE:-proxy1}-${REMOTE_SITE:-proxy2}
+      ML_SERVER_0_REMOTE_SEL_URL: http://beamsel:8080
       ML_SERVER_0_APIKEY: ${REMOTE_API_KEY:-thisApikeyIsNotSecure}
       ### Linkage Service not used for matching
       ML_SERVER_0_LINKAGE_SERVICE_BASE_URL: http://192.168.2.120:5000
@@ -39,88 +39,42 @@ services:
       ML_SERVER_0_LINKAGE_SERVICE_SHARED_KEY: bcd234
       ML_LOG_MODE: stdout #stdout=stdout everything else =logging in mainzelliste.log
       ML_LOG_LEVEL: INFO
-      no_proxy: "localhost,secureepilinker"
+      no_proxy: "localhost,sel"
     volumes:
-      - mainzellisteLogs:/usr/local/tomcat/logs/
+      # - ./logs:/usr/local/tomcat/logs/
       - ./config/mainzelliste.conf.docker:/run/secrets/mainzelliste.docker.conf
       - ./config/sel.conf.docker:/run/secrets/sel.docker.conf
     depends_on:
       - postgres
-      - secureepilinker
+      - sel
     networks:
       - intranet
-  secureepilinker:
-    image: ghcr.io/medicalinformatics/secureepilinker:ubuntu-feature-automaticDockerBuild 
-    links:
-      - vpn:stunnel_client
-      - vpn:stunnel_srv
+  sel:
+    image: docker.verbis.dkfz.de/onkofdz/secureepilinker:beamsel
     environment:
-      no_proxy: "mainzelliste,stunnel_client"
+      no_proxy: "mainzelliste,beamsel"
     volumes:
       - "./config/epilinker.serverconf.json:/data/serverconf.json"
     command: '-vvvv'
     networks:
       - intranet
-  stunnel_client:
-    image: docker.verbis.dkfz.de/cord/stunnel:develop
+  beamsel:
+    image: docker.verbis.dkfz.de/onkofdz/beam-sel
     environment:
-      - STUNNEL_CLIENT=yes
-      - STUNNEL_SERVICE=sel
-      - STUNNEL_PSK=/data/psk.txt
-      - STUNNEL_CONNECT_1=${REMOTE_TUNNEL}:29170
-      - STUNNEL_CONNECT_2=${REMOTE_TUNNEL}:29171
-      - STUNNEL_CONNECT_3=${REMOTE_TUNNEL}:29172
-      - STUNNEL_ACCEPT_1=:::8161
-      - STUNNEL_ACCEPT_2=:::1337
-      - STUNNEL_ACCEPT_3=:::1338
-    network_mode: "service:vpn"
-    volumes:
-      - ./config/stunnel_clt_psk.txt:/data/psk.txt
+      BEAM_URL: "http://proxy1:8081"
+      BEAM_SECRET: "App1Secret"
+      BEAM_ID: app1.proxy1.broker
+      SEL_ADDR: "sel:8161"
+      RUST_LOG: "debug,hyper=info"
+      no_proxy: "proxy1,proxy2,sel"
     depends_on:
-      - vpn
-  stunnel_srv:
-    image: docker.verbis.dkfz.de/cord/stunnel:develop
-    restart: always
-    environment:
-      - STUNNEL_CLIENT=no
-      - STUNNEL_SERVICE=sel
-      - STUNNEL_PSK=/data/psk.txt
-      - STUNNEL_ACCEPT_1=${LOCAL_TUNNEL}:29170
-      - STUNNEL_ACCEPT_2=${LOCAL_TUNNEL}:29171
-      - STUNNEL_ACCEPT_3=${LOCAL_TUNNEL}:29172
-      - STUNNEL_CONNECT_1=secureepilinker:8161
-      - STUNNEL_CONNECT_2=secureepilinker:1337
-      - STUNNEL_CONNECT_3=secureepilinker:1338
-    network_mode: "service:vpn"
-    depends_on:
-      - vpn
-    volumes:
-      - ./config/stunnel_clt_psk.txt:/data/psk.txt
-  vpn:
-    image: dperson/openvpn-client
-    cap_add:
-      - net_admin
+      - sel
     networks:
-      frontend: {}
-      intranet:
-    read_only: true
-    tmpfs:
-      - /run
-      - /tmp
-      #restart: unless-stopped
-    security_opt:
-      - label:disable
-    volumes:
-      - /dev/net:/dev/net:z
-      - ./config/vpn:/vpn
-
+      - intranet
+      - frontend
 networks:
   ### containers only in this network will not be able to access addresses outside this directory
   intranet:
-    internal: true
+    # internal: true
   frontend:
     driver: bridge
-volumes:
-  mainzellisteLogs:
-  postgresData:
-  postgresLogs:
